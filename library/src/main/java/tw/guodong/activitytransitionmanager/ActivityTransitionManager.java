@@ -37,7 +37,7 @@ public final class ActivityTransitionManager {
         canvasViews = new LinkedList<>();
         addViewGroupToWindow(viewGroup);
         transparentBackground = false;
-        duration = 1300;
+        duration = -1;
     }
 
     private void addViewGroupToWindow(ViewGroup viewGroup){
@@ -61,7 +61,7 @@ public final class ActivityTransitionManager {
         if (null != activity && !activity.equals(instance.activity)) {
             instance.activity = activity;
             instance.transparentBackground = false;
-            instance.duration = 1300;
+            instance.duration = -1;
         }
         return instance;
     }
@@ -185,6 +185,10 @@ public final class ActivityTransitionManager {
     private void animateView(final CanvasView canvasView, final View to) {
         float scaleX = to.getWidth()/(float)canvasView.getWidth();
         float scaleY = to.getHeight()/(float)canvasView.getHeight();
+        int duration = this.duration;
+        if(duration < 0){
+            duration = (int) canvasView.getView().animate().getDuration();
+        }
         canvasView.animate()
                 .x(to.getX() + canvasView.getWidth() * ((scaleX - 1) / 2))
                 .y(to.getY() + getActionBarHeight() + canvasView.getHeight() * ((scaleY - 1) / 2))

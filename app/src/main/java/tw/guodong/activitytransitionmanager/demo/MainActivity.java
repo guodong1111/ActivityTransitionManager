@@ -23,12 +23,13 @@ public class MainActivity extends ActionBarActivity {
         button = (Button) findViewById(R.id.button);
         imageView = findViewById(R.id.imageView);
         imageView.setAlpha(0);
+        imageView.animate().setDuration(500);
+        view.animate().setDuration(1000);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ActivityTransitionManager.getInstance(MainActivity.this).addFormerView(imageView, view);
                 Intent intent = new Intent(MainActivity.this,MainActivity2.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivityForResult(intent, 0);
             }
         });
@@ -37,6 +38,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        ActivityTransitionManager.getInstance(this).setAnimationDuration(2000);
         ActivityTransitionManager.getInstance(this).animateFormerViewToLatterView(view,imageView);
     }
 }
