@@ -68,10 +68,6 @@ public final class ActivityTransitionManager {
         return instance;
     }
 
-    public void setTransitionScreenOffset(int transitionScreenOffset) {
-        this.transitionScreenOffset = transitionScreenOffset;
-    }
-
     public void addFormerView(View... views) {
         clearFormerView();
         for (View view : views) {
@@ -112,6 +108,10 @@ public final class ActivityTransitionManager {
 
     public void setOnTransitioAnimationListener(OnTransitioAnimationListener onTransitioAnimationListener) {
         mOnTransitioAnimationListener = onTransitioAnimationListener;
+    }
+
+    public void setTransitionScreenOffset(int transitionScreenOffset) {
+        this.transitionScreenOffset = transitionScreenOffset;
     }
 
 //    public void setTransparentBackground(boolean transparentBackground) {
