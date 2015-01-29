@@ -18,13 +18,13 @@ AndroidManifest.xml:
 Activity A:
 
   切換前把要做過場的元件放入ActivityTransitionManager,裡面是塞View的陣列
-  ActivityTransitionManager.getInstance(MainActivity.this).addFormerView(imageView, view);
+  ActivityTransitionManager.getInstance(this).addFormerView(view...);
   
   
 Activity B:
 
   onCreate地方把過場元件的目標位置放入ActivityTransitionManager,裡面是塞View的陣列
-  ActivityTransitionManager.getInstance(this).animateFormerViewToLatterView(view,imageView);
+  ActivityTransitionManager.getInstance(this).animateFormerViewToLatterView(view...);
 
 
 注意:Activity A 跟 Activity B之間的過場元件的id必須要一樣才會對應到
