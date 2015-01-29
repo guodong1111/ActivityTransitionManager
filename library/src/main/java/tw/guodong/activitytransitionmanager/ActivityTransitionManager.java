@@ -45,7 +45,7 @@ public final class ActivityTransitionManager {
         WindowManager windowManager = (WindowManager) activity.getApplication().getSystemService(Context.WINDOW_SERVICE);
         WindowManager.LayoutParams wmParams = new WindowManager.LayoutParams();
         wmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
-        wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+        wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         wmParams.format = PixelFormat.TRANSLUCENT;
         wmParams.gravity = Gravity.LEFT | Gravity.TOP;
         wmParams.height = WindowManager.LayoutParams.MATCH_PARENT;
