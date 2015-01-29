@@ -172,6 +172,9 @@ public final class ActivityTransitionManager {
 
     private void examineView(View... views){
         animationEndCount = 0;
+        if (null != mOnTransitioAnimationListener) {
+            mOnTransitioAnimationListener.onAnimationStart();
+        }
         for (View view : views) {
             Iterator<CanvasView> iterator = canvasViews.iterator();
             while (iterator.hasNext()) {
