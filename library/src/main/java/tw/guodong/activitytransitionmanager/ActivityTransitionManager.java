@@ -3,7 +3,9 @@ package tw.guodong.activitytransitionmanager;
 import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
 import android.view.View;
@@ -27,8 +29,7 @@ public final class ActivityTransitionManager {
     private LinkedList<CanvasView> canvasViews;
     private OnTransitioAnimationListener mOnTransitioAnimationListener;
     private int duration, animationEndCount;
-    private boolean isNeedActionBar = true;
-    private boolean transparentBackground;
+    private boolean transparentBackground,isNeedActionBar;
 
     private ActivityTransitionManager(Activity activity) {
         this.activity = activity;
@@ -36,6 +37,7 @@ public final class ActivityTransitionManager {
         canvasViews = new LinkedList<>();
         addViewGroupToWindow(viewGroup);
         transparentBackground = false;
+        isNeedActionBar = true;
         duration = -1;
     }
 
@@ -60,14 +62,14 @@ public final class ActivityTransitionManager {
         if (null != activity && !activity.equals(instance.activity)) {
             instance.activity = activity;
             instance.transparentBackground = false;
+            instance.isNeedActionBar = true;
             instance.duration = -1;
         }
         return instance;
     }
 
-    public ActivityTransitionManager setNeedActionBar(boolean isNeedActionBar) {
+    public void setNeedActionBar(boolean isNeedActionBar) {
         this.isNeedActionBar = isNeedActionBar;
-        return instance;
     }
 
     public void addFormerView(View... views) {
@@ -112,7 +114,7 @@ public final class ActivityTransitionManager {
         mOnTransitioAnimationListener = onTransitioAnimationListener;
     }
 
-//    private void setTransparentBackground(boolean transparentBackground) {
+//    public void setTransparentBackground(boolean transparentBackground) {
 //        this.transparentBackground = transparentBackground;
 //    }
 
@@ -157,17 +159,17 @@ public final class ActivityTransitionManager {
         return isNeedActionBar ? actionBarHeight : 0;
     }
 
-//    private void setActivtiyTransition(){
-//        ColorDrawable colorDrawable = new ColorDrawable();
-//        int color;
-//        if(transparentBackground){
-//            color = Color.parseColor("#00000000");
-//        }else{
-//            color = Color.parseColor("#ffffffff");
-//        }
-//        colorDrawable.setColor(color);
-//        activity.getWindow().setBackgroundDrawable(colorDrawable);
-//    }
+    private void setActivtiyTransition(){
+        ColorDrawable colorDrawable = new ColorDrawable();
+        int color;
+        if(transparentBackground){
+            color = Color.parseColor("#00000000");
+        }else{
+            color = Color.parseColor("#ffffffff");
+        }
+        colorDrawable.setColor(color);
+        activity.getWindow().setBackgroundDrawable(colorDrawable);
+    }
 
     private void clearFormerView() {
         stopAllAnimation();
