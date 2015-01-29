@@ -77,7 +77,7 @@ public final class ActivityTransitionManager {
     }
 
     public void animateFormerViewToLatterView(final View... views) {
-        setActivtiyTransition();
+//        setActivtiyTransition();
         if(views[0].getHeight() != 0){
             examineView(views);
         }else{
@@ -108,9 +108,9 @@ public final class ActivityTransitionManager {
         mOnTransitioAnimationListener = onTransitioAnimationListener;
     }
 
-    public void setTransparentBackground(boolean transparentBackground) {
-        this.transparentBackground = transparentBackground;
-    }
+//    private void setTransparentBackground(boolean transparentBackground) {
+//        this.transparentBackground = transparentBackground;
+//    }
 
     public void stopAllAnimation(){
         Iterator<CanvasView> iterator = canvasViews.iterator();
@@ -153,17 +153,17 @@ public final class ActivityTransitionManager {
         return actionBarHeight;
     }
 
-    private void setActivtiyTransition(){
-        ColorDrawable colorDrawable = new ColorDrawable();
-        int color;
-        if(transparentBackground){
-            color = Color.parseColor("#00000000");
-        }else{
-            color = Color.parseColor("#ffffffff");
-        }
-        colorDrawable.setColor(color);
-        activity.getWindow().setBackgroundDrawable(colorDrawable);
-    }
+//    private void setActivtiyTransition(){
+//        ColorDrawable colorDrawable = new ColorDrawable();
+//        int color;
+//        if(transparentBackground){
+//            color = Color.parseColor("#00000000");
+//        }else{
+//            color = Color.parseColor("#ffffffff");
+//        }
+//        colorDrawable.setColor(color);
+//        activity.getWindow().setBackgroundDrawable(colorDrawable);
+//    }
 
     private void clearFormerView() {
         stopAllAnimation();
