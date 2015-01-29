@@ -28,8 +28,8 @@ public final class ActivityTransitionManager {
     private RelativeLayout viewGroup;
     private LinkedList<CanvasView> canvasViews;
     private OnTransitioAnimationListener mOnTransitioAnimationListener;
-    private int duration, animationEndCount;
-    private boolean transparentBackground,isNeedActionBar;
+    private int duration, animationEndCount,transitionScreenOffset;
+    private boolean transparentBackground;
 
     private ActivityTransitionManager(Activity activity) {
         this.activity = activity;
@@ -37,8 +37,8 @@ public final class ActivityTransitionManager {
         canvasViews = new LinkedList<>();
         addViewGroupToWindow(viewGroup);
         transparentBackground = false;
-        isNeedActionBar = true;
         duration = -1;
+        transitionScreenOffset = 0;
     }
 
     private void addViewGroupToWindow(ViewGroup viewGroup) {
@@ -62,14 +62,14 @@ public final class ActivityTransitionManager {
         if (null != activity && !activity.equals(instance.activity)) {
             instance.activity = activity;
             instance.transparentBackground = false;
-            instance.isNeedActionBar = true;
             instance.duration = -1;
+            instance.transitionScreenOffset = 0;
         }
         return instance;
     }
 
-    public void setNeedActionBar(boolean isNeedActionBar) {
-        this.isNeedActionBar = isNeedActionBar;
+    public void setTransitionScreenOffset(int transitionScreenOffset) {
+        this.transitionScreenOffset = transitionScreenOffset;
     }
 
     public void addFormerView(View... views) {
@@ -156,7 +156,7 @@ public final class ActivityTransitionManager {
             }
         } catch (NullPointerException e) {
         }
-        return isNeedActionBar ? actionBarHeight : 0;
+        return actionBarHeight;
     }
 
     private void setActivtiyTransition(){
@@ -204,7 +204,7 @@ public final class ActivityTransitionManager {
         }
         canvasView.animate()
                 .x(to.getX() + canvasView.getWidth() * ((scaleX - 1) / 2))
-                .y(to.getY() + getActionBarHeight() + canvasView.getHeight() * ((scaleY - 1) / 2))
+                .y(to.getY() + getActionBarHeight() + transitionScreenOffset + canvasView.getHeight() * ((scaleY - 1) / 2))
                 .rotation(to.getRotation())
                 .rotationX(to.getRotationX())
                 .rotationY(to.getRotationY())
