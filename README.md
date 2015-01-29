@@ -1,7 +1,6 @@
 # ActivityTransitionManager
 一個方便讓你可以使用View過場(切換Activity)的Library
 
-![Screenshot](https://raw.githubusercontent.com/guodong1111/ActivityTransitionManager/master/image/temp-150-91075853.gif)
 ![Screenshot](https://raw.githubusercontent.com/guodong1111/ActivityTransitionManager/master/image/animation.gif)
 
 ================================================================================
