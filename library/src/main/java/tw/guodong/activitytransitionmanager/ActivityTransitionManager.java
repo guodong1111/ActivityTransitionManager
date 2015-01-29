@@ -112,6 +112,20 @@ public final class ActivityTransitionManager {
         this.transparentBackground = transparentBackground;
     }
 
+    public void stopAllAnimation(){
+        Iterator<CanvasView> iterator = canvasViews.iterator();
+        while (iterator.hasNext()) {
+            CanvasView canvasView = iterator.next();
+            try {
+                if(isAnimationRunning()){
+                    canvasView.animate().cancel();
+                }
+                viewGroup.removeView(canvasView);
+            } catch (IllegalArgumentException e) {
+            }
+        }
+    }
+
     private void floatFormerView() {
         Iterator<CanvasView> iterator = canvasViews.iterator();
         while (iterator.hasNext()) {
@@ -152,17 +166,7 @@ public final class ActivityTransitionManager {
     }
 
     private void clearFormerView() {
-        Iterator<CanvasView> iterator = canvasViews.iterator();
-        while (iterator.hasNext()) {
-            CanvasView canvasView = iterator.next();
-            try {
-                if(isAnimationRunning()){
-                    canvasView.animate().cancel();
-                }
-                viewGroup.removeView(canvasView);
-            } catch (IllegalArgumentException e) {
-            }
-        }
+        stopAllAnimation();
         canvasViews.clear();
     }
 
@@ -200,8 +204,7 @@ public final class ActivityTransitionManager {
                 .setDuration(duration).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-                to.setVisibility(View.INVISIBLE);
-                canvasView.getView().setVisibility(View.INVISIBLE);
+                setViewVisibility(View.INVISIBLE);
                 animationEndCount++;
                 if (null != mOnTransitioAnimationListener) {
                     mOnTransitioAnimationListener.onViewAnimationStart(canvasView.getView(), animation);
@@ -210,8 +213,7 @@ public final class ActivityTransitionManager {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                to.setVisibility(View.VISIBLE);
-                canvasView.getView().setVisibility(View.VISIBLE);
+                setViewVisibility(View.VISIBLE);
                 animationEndCount--;
                 if (null != mOnTransitioAnimationListener) {
                     mOnTransitioAnimationListener.onViewAnimationEnd(canvasView.getView(), animation);
@@ -226,6 +228,7 @@ public final class ActivityTransitionManager {
 
             @Override
             public void onAnimationCancel(Animator animation) {
+                setViewVisibility(View.VISIBLE);
                 if (null != mOnTransitioAnimationListener) {
                     mOnTransitioAnimationListener.onViewAnimationCancel(canvasView.getView(), animation);
                 }
@@ -236,6 +239,11 @@ public final class ActivityTransitionManager {
                 if (null != mOnTransitioAnimationListener) {
                     mOnTransitioAnimationListener.onViewAnimationRepeat(canvasView.getView(), animation);
                 }
+            }
+
+            private void setViewVisibility(int visibility){
+                to.setVisibility(visibility);
+                canvasView.getView().setVisibility(visibility);
             }
         }).start();
     }
