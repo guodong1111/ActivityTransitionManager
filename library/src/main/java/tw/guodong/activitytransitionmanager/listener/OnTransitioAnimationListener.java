@@ -4,7 +4,7 @@ import android.animation.Animator;
 import android.view.View;
 
 /**
- * Created by USER on 2015/1/29.
+ * Created by Tony on 2015/1/29.
  */
 public interface OnTransitioAnimationListener {
     public void onAnimationEnd(Animator animation);
