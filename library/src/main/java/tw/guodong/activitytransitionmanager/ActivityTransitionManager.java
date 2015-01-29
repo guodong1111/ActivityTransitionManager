@@ -17,14 +17,17 @@ import android.widget.RelativeLayout;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import tw.guodong.activitytransitionmanager.listener.OnTransitioAnimationListener;
+
 /**
  * Created by USER on 2015/1/27.
  */
-public class ActivityTransitionManager {
+public final class ActivityTransitionManager {
     private static ActivityTransitionManager instance;
     private Activity activity;
     private RelativeLayout viewGroup;
     private LinkedList<CanvasView> canvasViews;
+    private OnTransitioAnimationListener mOnTransitioAnimationListener;
     private int duration,animationEndCount;
     private boolean transparentBackground;
 
@@ -33,6 +36,8 @@ public class ActivityTransitionManager {
         viewGroup = new RelativeLayout(activity);
         canvasViews = new LinkedList<>();
         addViewGroupToWindow(viewGroup);
+        transparentBackground = false;
+        duration = 1300;
     }
 
     private void addViewGroupToWindow(ViewGroup viewGroup){
@@ -53,7 +58,7 @@ public class ActivityTransitionManager {
         if (null == instance) {
             instance = new ActivityTransitionManager(activity);
         }
-        if (null != instance.activity && !instance.activity.equals(activity)) {
+        if (null != activity && !activity.equals(instance.activity)) {
             instance.activity = activity;
             instance.transparentBackground = false;
             instance.duration = 1300;
@@ -99,6 +104,10 @@ public class ActivityTransitionManager {
         }
     }
 
+    public void setOnTransitioAnimationListener(OnTransitioAnimationListener onTransitioAnimationListener) {
+        mOnTransitioAnimationListener = onTransitioAnimationListener;
+    }
+
     public void setTransparentBackground(boolean transparentBackground) {
         this.transparentBackground = transparentBackground;
     }
@@ -119,19 +128,13 @@ public class ActivityTransitionManager {
 
     private int getActionBarHeight() {
         int actionBarHeight = 0;
-        try {
-            if (activity.getActionBar().getHeight() > 0) {
+        try{
+            if(activity instanceof ActionBarActivity){
+                actionBarHeight = ((ActionBarActivity) activity).getSupportActionBar().getHeight();
+            }else{
                 actionBarHeight = activity.getActionBar().getHeight();
             }
-        } catch (NullPointerException e) {
-        }
-        try {
-            if (activity instanceof ActionBarActivity) {
-                if (((ActionBarActivity) activity).getSupportActionBar().getHeight() > 0) {
-                    actionBarHeight = ((ActionBarActivity) activity).getSupportActionBar().getHeight();
-                }
-            }
-        } catch (NullPointerException e) {
+        }catch(NullPointerException e){
         }
         return actionBarHeight;
     }
@@ -164,6 +167,7 @@ public class ActivityTransitionManager {
     }
 
     private void examineView(View... views){
+        animationEndCount = 0;
         for (View view : views) {
             Iterator<CanvasView> iterator = canvasViews.iterator();
             while (iterator.hasNext()) {
@@ -181,8 +185,12 @@ public class ActivityTransitionManager {
     private void animateView(final CanvasView canvasView, final View to) {
         float scaleX = to.getWidth()/(float)canvasView.getWidth();
         float scaleY = to.getHeight()/(float)canvasView.getHeight();
-        canvasView.animate().x(to.getX()+canvasView.getWidth()*((scaleX - 1)/2)).y(to.getY() + getActionBarHeight()+canvasView.getHeight()*((scaleY - 1)/2))
-                .rotation(to.getRotation()).rotationX(to.getRotationX()).rotationY(to.getRotationY())
+        canvasView.animate()
+                .x(to.getX() + canvasView.getWidth() * ((scaleX - 1) / 2))
+                .y(to.getY() + getActionBarHeight() + canvasView.getHeight() * ((scaleY - 1) / 2))
+                .rotation(to.getRotation())
+                .rotationX(to.getRotationX())
+                .rotationY(to.getRotationY())
                 .alpha(to.getAlpha())
                 .scaleX(scaleX).scaleY(scaleY)
                 .setDuration(duration).setListener(new Animator.AnimatorListener() {
@@ -191,6 +199,9 @@ public class ActivityTransitionManager {
                 to.setVisibility(View.INVISIBLE);
                 canvasView.getView().setVisibility(View.INVISIBLE);
                 animationEndCount++;
+                if (null != mOnTransitioAnimationListener) {
+                    mOnTransitioAnimationListener.onViewAnimationStart(canvasView.getView(), animation);
+                }
             }
 
             @Override
@@ -198,18 +209,29 @@ public class ActivityTransitionManager {
                 to.setVisibility(View.VISIBLE);
                 canvasView.getView().setVisibility(View.VISIBLE);
                 animationEndCount--;
-                if(!isAnimationRunning()){
+                if (null != mOnTransitioAnimationListener) {
+                    mOnTransitioAnimationListener.onViewAnimationEnd(canvasView.getView(), animation);
+                }
+                if (!isAnimationRunning()) {
                     clearFormerView();
+                    if (null != mOnTransitioAnimationListener) {
+                        mOnTransitioAnimationListener.onAnimationEnd(animation);
+                    }
                 }
             }
 
             @Override
             public void onAnimationCancel(Animator animation) {
+                if (null != mOnTransitioAnimationListener) {
+                    mOnTransitioAnimationListener.onViewAnimationCancel(canvasView.getView(), animation);
+                }
             }
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-
+                if (null != mOnTransitioAnimationListener) {
+                    mOnTransitioAnimationListener.onViewAnimationRepeat(canvasView.getView(), animation);
+                }
             }
         }).start();
     }
