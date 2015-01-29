@@ -37,6 +37,7 @@ ActivityTransitionManager.java
 Function介紹:
 
   void addFormerView(View... views)  //放入要過場的元件(代表起始位置),呼叫的同時會將view複製出來並且重疊到WindowManager上
+                                        //views放越前面的元件會在Windowmanager顯示裡面的越底層
   
   void animateFormerViewToLatterView //放入過場後的元件(代表結束的位置),呼叫的同時動畫開始
   
