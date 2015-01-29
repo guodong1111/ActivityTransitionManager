@@ -20,6 +20,7 @@ Activity A:
   切換前把要做過場的元件放入ActivityTransitionManager,裡面是塞View的陣列
   ActivityTransitionManager.getInstance(MainActivity.this).addFormerView(imageView, view);
   
+  
 Activity B:
 
   onCreate地方把過場元件的目標位置放入ActivityTransitionManager,裡面是塞View的陣列
