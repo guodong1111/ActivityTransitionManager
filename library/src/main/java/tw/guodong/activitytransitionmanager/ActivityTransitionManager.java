@@ -3,9 +3,7 @@ package tw.guodong.activitytransitionmanager;
 import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
 import android.view.View;
@@ -83,8 +81,8 @@ public final class ActivityTransitionManager {
     }
 
     public void animateFormerViewToLatterView(final View... views) {
-        setActivtiyTransition();
-        if (views[0].getHeight() != 0) {
+//        setActivtiyTransition();
+        if(views[0].getHeight() != 0) {
             examineView(views);
         } else {
             views[0].getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -114,8 +112,22 @@ public final class ActivityTransitionManager {
         mOnTransitioAnimationListener = onTransitioAnimationListener;
     }
 
-    public void setTransparentBackground(boolean transparentBackground) {
-        this.transparentBackground = transparentBackground;
+//    private void setTransparentBackground(boolean transparentBackground) {
+//        this.transparentBackground = transparentBackground;
+//    }
+
+    public void stopAllAnimation(){
+        Iterator<CanvasView> iterator = canvasViews.iterator();
+        while (iterator.hasNext()) {
+            CanvasView canvasView = iterator.next();
+            try {
+                if(isAnimationRunning()){
+                    canvasView.animate().cancel();
+                }
+                viewGroup.removeView(canvasView);
+            } catch (IllegalArgumentException e) {
+            }
+        }
     }
 
     private void floatFormerView() {
@@ -145,35 +157,28 @@ public final class ActivityTransitionManager {
         return isNeedActionBar ? actionBarHeight : 0;
     }
 
-    private void setActivtiyTransition() {
-        ColorDrawable colorDrawable = new ColorDrawable();
-        int color;
-        if (transparentBackground) {
-            color = Color.parseColor("#00000000");
-        } else {
-            color = Color.parseColor("#ffffffff");
-        }
-        colorDrawable.setColor(color);
-        activity.getWindow().setBackgroundDrawable(colorDrawable);
-    }
+//    private void setActivtiyTransition(){
+//        ColorDrawable colorDrawable = new ColorDrawable();
+//        int color;
+//        if(transparentBackground){
+//            color = Color.parseColor("#00000000");
+//        }else{
+//            color = Color.parseColor("#ffffffff");
+//        }
+//        colorDrawable.setColor(color);
+//        activity.getWindow().setBackgroundDrawable(colorDrawable);
+//    }
 
     private void clearFormerView() {
-        Iterator<CanvasView> iterator = canvasViews.iterator();
-        while (iterator.hasNext()) {
-            CanvasView canvasView = iterator.next();
-            try {
-                if (isAnimationRunning()) {
-                    canvasView.animate().cancel();
-                }
-                viewGroup.removeView(canvasView);
-            } catch (IllegalArgumentException e) {
-            }
-        }
+        stopAllAnimation();
         canvasViews.clear();
     }
 
     private void examineView(View... views) {
         animationEndCount = 0;
+        if (null != mOnTransitioAnimationListener) {
+            mOnTransitioAnimationListener.onAnimationStart();
+        }
         for (View view : views) {
             Iterator<CanvasView> iterator = canvasViews.iterator();
             while (iterator.hasNext()) {
@@ -206,8 +211,7 @@ public final class ActivityTransitionManager {
                 .setDuration(duration).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-                to.setVisibility(View.INVISIBLE);
-                canvasView.getView().setVisibility(View.INVISIBLE);
+                setViewVisibility(View.INVISIBLE);
                 animationEndCount++;
                 if (null != mOnTransitioAnimationListener) {
                     mOnTransitioAnimationListener.onViewAnimationStart(canvasView.getView(), animation);
@@ -216,8 +220,7 @@ public final class ActivityTransitionManager {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                to.setVisibility(View.VISIBLE);
-                canvasView.getView().setVisibility(View.VISIBLE);
+                setViewVisibility(View.VISIBLE);
                 animationEndCount--;
                 if (null != mOnTransitioAnimationListener) {
                     mOnTransitioAnimationListener.onViewAnimationEnd(canvasView.getView(), animation);
@@ -232,6 +235,7 @@ public final class ActivityTransitionManager {
 
             @Override
             public void onAnimationCancel(Animator animation) {
+                setViewVisibility(View.VISIBLE);
                 if (null != mOnTransitioAnimationListener) {
                     mOnTransitioAnimationListener.onViewAnimationCancel(canvasView.getView(), animation);
                 }
@@ -242,6 +246,11 @@ public final class ActivityTransitionManager {
                 if (null != mOnTransitioAnimationListener) {
                     mOnTransitioAnimationListener.onViewAnimationRepeat(canvasView.getView(), animation);
                 }
+            }
+
+            private void setViewVisibility(int visibility){
+                to.setVisibility(visibility);
+                canvasView.getView().setVisibility(visibility);
             }
         }).start();
     }

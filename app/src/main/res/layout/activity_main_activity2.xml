@@ -9,7 +9,8 @@
         android:id="@+id/imageView"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:src="#ff33cc33"/>
+        android:scaleType="fitXY"
+        android:src="@drawable/hello"/>
 
     <TextView
         android:id="@+id/textView"
@@ -17,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:textSize="30sp"/>
+        android:textSize="40sp"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -25,8 +26,7 @@
         android:text="Activity 2"
         android:id="@+id/button2"
         android:layout_below="@+id/textView"
-        android:layout_alignRight="@+id/imageView"
-        android:layout_alignEnd="@+id/imageView"
-        android:layout_marginTop="60dp" />
+        android:layout_marginTop="60dp"
+        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

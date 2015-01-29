@@ -25,9 +25,13 @@ public class MainActivity2 extends ActionBarActivity {
         button.setAlpha(0);
         imageView = findViewById(R.id.imageView);
         if(savedInstanceState == null){
-            ActivityTransitionManager.getInstance(this).setTransparentBackground(true);
             ActivityTransitionManager.getInstance(this).animateFormerViewToLatterView(view,imageView);
             ActivityTransitionManager.getInstance(this).setOnTransitioAnimationListener(new OnTransitioAnimationListener() {
+                @Override
+                public void onAnimationStart() {
+
+                }
+
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     button.animate().alpha(1f).setDuration(300).start();
