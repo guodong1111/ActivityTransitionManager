@@ -6,6 +6,7 @@
     </style>
     <style name="AppThemeTranslucent" parent="AppTheme">
         <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
     </style>
 
 </resources>
