@@ -10,7 +10,12 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <application  
-      android:theme="@style/AppThemeTranslucent" >
+        android:theme="@style/NoAnimationTheme" >
+      
+        <!--有需要透明背景的Activity才使用-->
+        <activity
+            android:name=".MainActivity2"
+            android:theme="@style/AppThemeTranslucent">
 
 
 假設今天是Activity A -> Activity B
@@ -57,9 +62,9 @@ void setAnimationDuration(int duration)  //設定動畫的時間
   
 boolean isAnimationRunning()  //判斷是否動畫還在進行
   
-setTransparentBackground(boolean transparentBackground) //設定Activity B是否為透明背景
-  
-setOnTransitioAnimationListener(OnTransitioAnimationListener onTransitioAnimationListener)    //設定listener回收callback
+void setOnTransitioAnimationListener(OnTransitioAnimationListener onTransitioAnimationListener)    //設定listener回收callback
+
+void setTransitionScreenOffset(int transitionScreenOffset) //客製化是否需要讓過場動畫的起始 高度偏移
 ```
   
   
