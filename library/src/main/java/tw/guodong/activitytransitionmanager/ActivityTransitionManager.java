@@ -20,7 +20,7 @@ import java.util.LinkedList;
 import tw.guodong.activitytransitionmanager.listener.OnTransitioAnimationListener;
 
 /**
- * Created by USER on 2015/1/27.
+ * Created by Tony on 2015/1/27.
  */
 public final class ActivityTransitionManager {
     private static ActivityTransitionManager instance;

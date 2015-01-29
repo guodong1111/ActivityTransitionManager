@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by USER on 2015/1/28.
+ * Created by Tony on 2015/1/28.
  */
 public class CanvasView extends View{
     private View mView;
