@@ -15,6 +15,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -25,15 +26,18 @@ import tw.guodong.activitytransitionmanager.listener.OnTransitioAnimationListene
  */
 public final class ActivityTransitionManager {
     private static ActivityTransitionManager instance;
+    private static int tagKey = 19881111 << 1;
     private Activity activity;
     private RelativeLayout viewGroup;
     private LinkedList<CanvasView> canvasViews;
     private OnTransitioAnimationListener mOnTransitioAnimationListener;
+    private HashMap<Activity,View[]> tmpViews;
     private int duration, animationEndCount,transitionScreenOffset;
     private boolean transparentBackground;
 
     private ActivityTransitionManager(Activity activity) {
         this.activity = activity;
+        tmpViews = new HashMap();
         viewGroup = new RelativeLayout(activity);
         canvasViews = new LinkedList<>();
         addViewGroupToWindow(viewGroup);
@@ -69,8 +73,25 @@ public final class ActivityTransitionManager {
         return instance;
     }
 
+    public static int getTagKey() {
+        return tagKey;
+    }
+
+    public static void setTagKey(int tagKey) {
+        if ((tagKey >>> 24) < 2) {
+            throw new IllegalArgumentException("The key must be an application-specific "
+                    + "resource id.");
+        }
+        ActivityTransitionManager.tagKey = tagKey;
+    }
+
     public void addFormerView(View... views) {
         clearFormerView();
+        if(views.length > 0){
+            tmpViews.put(activity,views);
+        }else{
+            views = tmpViews.get(activity);
+        }
         for (View view : views) {
             if (!canvasViews.contains(view)) {
                 canvasViews.add(new CanvasView(activity.getApplicationContext(), view));
@@ -79,16 +100,24 @@ public final class ActivityTransitionManager {
         floatFormerView();
     }
 
-    public void animateFormerViewToLatterView(final View... views) {
+    public void animateFormerViewToLatterView(View... views) {
 //        setActivtiyTransition();
-        if(views[0].getHeight() != 0) {
-            examineView(views);
+        final View[] examineViews;
+        if(views.length > 0){
+            examineViews = views;
+            tmpViews.put(activity,views);
+        }else{
+            examineViews = tmpViews.get(activity);
+        }
+
+        if(examineViews[0].getHeight() != 0) {
+            examineView(examineViews);
         } else {
-            views[0].getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            examineViews[0].getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
-                    views[0].getViewTreeObserver().removeOnPreDrawListener(this);
-                    examineView(views);
+                    examineViews[0].getViewTreeObserver().removeOnPreDrawListener(this);
+                    examineView(examineViews);
                     return true;
                 }
             });
@@ -188,7 +217,7 @@ public final class ActivityTransitionManager {
             while (iterator.hasNext()) {
                 try {
                     CanvasView canvasView = iterator.next();
-                    if (view.getId() == canvasView.getView().getId()) {
+                    if (view.getTag(tagKey) == canvasView.getView().getTag(tagKey)) {
                         animateView(canvasView, view);
                     }
                 } catch (NullPointerException e) {
