@@ -14,13 +14,17 @@
         android:text="@string/hello_world"
         android:layout_centerInParent="true"/>
 
-    <ImageView
+    <RelativeLayout
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:id="@+id/imageView"
-        android:layout_centerVertical="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/hello"/>
+        android:layout_centerVertical="true">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/imageView"
+            android:scaleType="fitXY"
+            android:src="@drawable/hello"/>
+    </RelativeLayout>
 
     <Button
         android:layout_width="wrap_content"

@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
@@ -45,7 +46,7 @@ public final class ActivityTransitionManager {
         WindowManager windowManager = (WindowManager) activity.getApplication().getSystemService(Context.WINDOW_SERVICE);
         WindowManager.LayoutParams wmParams = new WindowManager.LayoutParams();
         wmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
-        wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         wmParams.format = PixelFormat.TRANSLUCENT;
         wmParams.gravity = Gravity.LEFT | Gravity.TOP;
         wmParams.height = WindowManager.LayoutParams.MATCH_PARENT;
@@ -137,8 +138,9 @@ public final class ActivityTransitionManager {
         while (iterator.hasNext()) {
             CanvasView canvasView = iterator.next();
             View view = canvasView.getView();
-            canvasView.setX(view.getX());
-            canvasView.setY(view.getY() + getActionBarHeight());
+            int[] xy = getViewXY(view);
+            canvasView.setX(xy[0]);
+            canvasView.setY(xy[1]);
             try {
                 viewGroup.addView(canvasView);
             } catch (IllegalStateException e) {
@@ -146,17 +148,17 @@ public final class ActivityTransitionManager {
         }
     }
 
-    private int getActionBarHeight() {
-        int actionBarHeight = 0;
-        try {
-            if (activity instanceof ActionBarActivity) {
-                actionBarHeight = ((ActionBarActivity) activity).getSupportActionBar().getHeight();
-            } else {
-                actionBarHeight = activity.getActionBar().getHeight();
-            }
-        } catch (NullPointerException e) {
+    private int[] getViewXY(View view) {
+        int[] xy;
+        ViewParent viewParent = view.getParent();
+        if(null != viewParent && viewParent instanceof View){
+            xy = getViewXY((View)viewParent);
+        }else{
+            xy = new int[2];
         }
-        return actionBarHeight;
+        xy[0] += view.getX();
+        xy[1] += view.getY();
+        return xy;
     }
 
     private void setActivtiyTransition(){
@@ -202,9 +204,10 @@ public final class ActivityTransitionManager {
         if (duration < 0) {
             duration = (int) canvasView.getView().animate().getDuration();
         }
+        int[] xy = getViewXY(to);
         canvasView.animate()
-                .x(to.getX() + canvasView.getWidth() * ((scaleX - 1) / 2))
-                .y(to.getY() + getActionBarHeight() + transitionScreenOffset + canvasView.getHeight() * ((scaleY - 1) / 2))
+                .x(xy[0] + canvasView.getWidth() * ((scaleX - 1) / 2))
+                .y(xy[1] + transitionScreenOffset + canvasView.getHeight() * ((scaleY - 1) / 2))
                 .rotation(to.getRotation())
                 .rotationX(to.getRotationX())
                 .rotationY(to.getRotationY())
