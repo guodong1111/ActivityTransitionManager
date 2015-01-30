@@ -4,13 +4,18 @@
     tools:context="tw.guodong.myapplication.MainActivity2">
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/imageView"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/hello"/>
+        android:scaleType="fitXY"/>
+
+    <ImageView
+        android:id="@+id/imageView_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="#55ffffff"/>
 
     <TextView
         android:id="@+id/textView"
@@ -21,10 +26,10 @@
         android:textSize="40sp"/>
 
     <Button
+        android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Activity 2"
-        android:id="@+id/button2"
         android:layout_below="@+id/textView"
         android:layout_marginTop="60dp"
         android:layout_centerHorizontal="true"/>
