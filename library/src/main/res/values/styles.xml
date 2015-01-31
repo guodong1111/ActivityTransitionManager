@@ -7,7 +7,7 @@
     <style name="NoAnimationTheme" parent="AppTheme">
         <item name="android:windowAnimationStyle">@null</item>
     </style>
-    <style name="AppThemeTranslucent" parent="NoAnimationTheme">
+    <style name="TranslucentTheme" parent="NoAnimationTheme">
         <!-- Customize your theme here. -->
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
