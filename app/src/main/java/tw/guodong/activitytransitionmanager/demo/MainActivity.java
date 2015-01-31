@@ -1,5 +1,6 @@
 package tw.guodong.activitytransitionmanager.demo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -7,10 +8,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
-import java.util.ArrayList;
-import java.util.List;
+import tw.guodong.activitytransitionmanager.ActivityTransitionManager;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -62,4 +61,16 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        ActivityTransitionManager.getInstance(this).stopAllAnimation();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ActivityTransitionManager.getInstance(this).setAnimationDuration(500);
+        ActivityTransitionManager.getInstance(this).animateFormerViewToLatterView();
+    }
 }
