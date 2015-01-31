@@ -37,12 +37,24 @@ public class MainActivity extends ActionBarActivity {
         }
 
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            View view = mInflater.inflate(R.layout.adapter_view, null);
+        public Object instantiateItem(ViewGroup container, final int position) {
+            final View view = mInflater.inflate(R.layout.adapter_view, null);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    View imageView = view.findViewById(R.id.imageView);
+                    View textView = view.findViewById(R.id.textView);
+                    imageView.setTag(ActivityTransitionManager.getTagKey(), "imageView");
+                    imageView.animate().setDuration(500);
+                    textView.setTag(ActivityTransitionManager.getTagKey(), "textView");
+                    textView.animate().setDuration(1000);
+                    ActivityTransitionManager.getInstance(MainActivity.this).addFormerView(imageView, textView);
+                    Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("imageRes",imageRes[position]);
+                    bundle.putString("text",text[position]);
+                    intent.putExtras(bundle);
+                    startActivityForResult(intent, 0);
                 }
             });
             container.addView(view);
