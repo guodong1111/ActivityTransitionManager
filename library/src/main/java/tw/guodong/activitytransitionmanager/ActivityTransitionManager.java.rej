@@ -1,0 +1,9 @@
+diff a/library/src/main/java/tw/guodong/activitytransitionmanager/ActivityTransitionManager.java b/library/src/main/java/tw/guodong/activitytransitionmanager/ActivityTransitionManager.java	(rejected hunks)
+@@ -6,6 +6,7 @@
+ import android.graphics.Color;
+ import android.graphics.PixelFormat;
+ import android.graphics.drawable.ColorDrawable;
++import android.support.v4.view.ViewPager;
+ import android.support.v7.app.ActionBarActivity;
+ import android.view.Gravity;
+ import android.view.View;

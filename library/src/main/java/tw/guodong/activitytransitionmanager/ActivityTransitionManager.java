@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.ColorDrawable;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
 import android.view.View;
@@ -32,7 +33,7 @@ public final class ActivityTransitionManager {
     private LinkedList<CanvasView> canvasViews;
     private OnTransitioAnimationListener mOnTransitioAnimationListener;
     private HashMap<Activity,View[]> tmpViews;
-    private int duration, animationEndCount,transitionScreenOffset;
+    private int duration, animationEndCount;
     private boolean transparentBackground;
 
     private ActivityTransitionManager(Activity activity) {
@@ -43,7 +44,6 @@ public final class ActivityTransitionManager {
         addViewGroupToWindow(viewGroup);
         transparentBackground = false;
         duration = -1;
-        transitionScreenOffset = 0;
     }
 
     private void addViewGroupToWindow(ViewGroup viewGroup) {
@@ -68,7 +68,6 @@ public final class ActivityTransitionManager {
             instance.activity = activity;
             instance.transparentBackground = false;
             instance.duration = -1;
-            instance.transitionScreenOffset = 0;
         }
         return instance;
     }
@@ -140,10 +139,6 @@ public final class ActivityTransitionManager {
         mOnTransitioAnimationListener = onTransitioAnimationListener;
     }
 
-    public void setTransitionScreenOffset(int transitionScreenOffset) {
-        this.transitionScreenOffset = transitionScreenOffset;
-    }
-
 //    public void setTransparentBackground(boolean transparentBackground) {
 //        this.transparentBackground = transparentBackground;
 //    }
@@ -185,8 +180,10 @@ public final class ActivityTransitionManager {
         }else{
             xy = new int[2];
         }
-        xy[0] += view.getX();
-        xy[1] += view.getY();
+        if(!(viewParent instanceof ViewPager)){
+            xy[0] += view.getX();
+            xy[1] += view.getY();
+        }
         return xy;
     }
 
@@ -236,7 +233,7 @@ public final class ActivityTransitionManager {
         int[] xy = getViewXY(to);
         canvasView.animate()
                 .x(xy[0] + canvasView.getWidth() * ((scaleX - 1) / 2))
-                .y(xy[1] + transitionScreenOffset + canvasView.getHeight() * ((scaleY - 1) / 2))
+                .y(xy[1]  + canvasView.getHeight() * ((scaleY - 1) / 2))
                 .rotation(to.getRotation())
                 .rotationX(to.getRotationX())
                 .rotationY(to.getRotationY())
