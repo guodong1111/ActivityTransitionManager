@@ -15,7 +15,7 @@
         <!--有需要透明背景的Activity才使用-->
         <activity
             android:name=".MainActivity2"
-            android:theme="@style/AppThemeTranslucent">
+            android:theme="@style/TranslucentTheme">
 
 
 假設今天是Activity A -> Activity B
@@ -41,7 +41,7 @@ ActivityTransitionManager.getInstance(this).animateFormerViewToLatterView(view..
 ```
 
 
-注意:Activity A 跟 Activity B之間的過場元件的id必須要一樣才會對應到
+注意:Activity A 跟 Activity B之間的過場元件的tag必須要一樣才會對應到
 
 
 ================================================================================
@@ -64,7 +64,6 @@ boolean isAnimationRunning()  //判斷是否動畫還在進行
   
 void setOnTransitioAnimationListener(OnTransitioAnimationListener onTransitioAnimationListener)    //設定listener回收callback
 
-void setTransitionScreenOffset(int transitionScreenOffset) //客製化是否需要讓過場動畫的起始 高度偏移
 ```
   
   
