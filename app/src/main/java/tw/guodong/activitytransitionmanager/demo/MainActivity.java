@@ -26,6 +26,7 @@ public class MainActivity extends ActionBarActivity {
         listView = (ListView) findViewById(R.id.listView);
         listView.setAdapter(new MyAdapter(this,imageRes,text));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 View imageView = view.findViewById(R.id.imageView);
