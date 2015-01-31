@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -162,7 +161,7 @@ public final class ActivityTransitionManager {
         while (iterator.hasNext()) {
             CanvasView canvasView = iterator.next();
             View view = canvasView.getView();
-            int[] xy = getViewXY(view);
+            int[] xy = getViewLocationOnScreen(view);
             canvasView.setX(xy[0]);
             canvasView.setY(xy[1]);
             try {
@@ -172,19 +171,10 @@ public final class ActivityTransitionManager {
         }
     }
 
-    private int[] getViewXY(View view) {
-        int[] xy;
-        ViewParent viewParent = view.getParent();
-        if(null != viewParent && viewParent instanceof View){
-            xy = getViewXY((View)viewParent);
-        }else{
-            xy = new int[2];
-        }
-        if(!(viewParent instanceof ViewPager)){
-            xy[0] += view.getX();
-            xy[1] += view.getY();
-        }
-        return xy;
+    private int[] getViewLocationOnScreen(View view) {
+        int[] location = {0,0};
+        view.getLocationOnScreen(location);
+        return location;
     }
 
     private void setActivtiyTransition(){
@@ -230,7 +220,7 @@ public final class ActivityTransitionManager {
         if (duration < 0) {
             duration = (int) canvasView.getView().animate().getDuration();
         }
-        int[] xy = getViewXY(to);
+        int[] xy = getViewLocationOnScreen(to);
         canvasView.animate()
                 .x(xy[0] + canvasView.getWidth() * ((scaleX - 1) / 2))
                 .y(xy[1]  + canvasView.getHeight() * ((scaleY - 1) / 2))
