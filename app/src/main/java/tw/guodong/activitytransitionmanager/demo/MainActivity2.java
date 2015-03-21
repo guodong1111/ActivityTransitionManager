@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import tw.guodong.activitytransitionmanager.ActivityTransitionManager;
+import tw.guodong.activitytransitionmanager.CanvasView;
 import tw.guodong.activitytransitionmanager.listener.OnTransitioAnimationListener;
 
 
@@ -48,22 +49,22 @@ public class MainActivity2 extends ActionBarActivity {
                 }
 
                 @Override
-                public void onViewAnimationStart(View view, Animator animation) {
+                public void onViewAnimationStart(CanvasView from, View to, Animator animation) {
 
                 }
 
                 @Override
-                public void onViewAnimationEnd(View view, Animator animation) {
+                public void onViewAnimationEnd(CanvasView from, View to, Animator animation) {
 
                 }
 
                 @Override
-                public void onViewAnimationCancel(View view, Animator animation) {
+                public void onViewAnimationCancel(CanvasView view, Animator animation) {
 
                 }
 
                 @Override
-                public void onViewAnimationRepeat(View view, Animator animation) {
+                public void onViewAnimationRepeat(CanvasView view, Animator animation) {
 
                 }
             });
