@@ -3,10 +3,7 @@ package tw.guodong.activitytransitionmanager;
 import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +12,6 @@ import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -28,28 +24,24 @@ public final class ActivityTransitionManager {
     private static ActivityTransitionManager instance;
     private static int tagKey = 19881111 << 1;
     private Activity activity;
-    private ViewGroup viewGroup;
+    private RelativeLayout viewGroup;
     private LinkedList<CanvasView> canvasViews;
     private OnTransitioAnimationListener mOnTransitioAnimationListener;
-    private HashMap<Activity,View[]> tmpViews;
     private int duration, animationEndCount;
-    private boolean transparentBackground;
 
     private ActivityTransitionManager(Activity activity) {
         this.activity = activity;
-        tmpViews = new HashMap();
+        viewGroup = new RelativeLayout(activity);
         canvasViews = new LinkedList<>();
-        transparentBackground = false;
+        addViewGroupToWindow(viewGroup);
         duration = -1;
-        addViewGroupToWindow(new RelativeLayout(activity));
     }
 
     private void addViewGroupToWindow(ViewGroup viewGroup) {
-        this.viewGroup = viewGroup;
-        WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager windowManager = (WindowManager) activity.getApplication().getSystemService(Context.WINDOW_SERVICE);
         WindowManager.LayoutParams wmParams = new WindowManager.LayoutParams();
-        wmParams.type = WindowManager.LayoutParams.TYPE_APPLICATION;
-        wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        wmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         wmParams.format = PixelFormat.TRANSLUCENT;
         wmParams.gravity = Gravity.LEFT | Gravity.TOP;
         wmParams.height = WindowManager.LayoutParams.MATCH_PARENT;
@@ -59,9 +51,21 @@ public final class ActivityTransitionManager {
         windowManager.addView(viewGroup, wmParams);
     }
 
+    public synchronized static ActivityTransitionManager getInstance(Context context) {
+        if(context instanceof Activity){
+            return getInstance((Activity)context);
+        }else{
+            throw new RuntimeException("context hava to instanceof Activity");
+        }
+    }
+
     public synchronized static ActivityTransitionManager getInstance(Activity activity) {
         if (null == instance) {
             instance = new ActivityTransitionManager(activity);
+        }
+        if (null != activity && !activity.equals(instance.activity)) {
+            instance.activity = activity;
+            instance.duration = -1;
         }
         return instance;
     }
@@ -80,28 +84,26 @@ public final class ActivityTransitionManager {
 
     public void addFormerView(View... views) {
         clearFormerView();
-        if(views.length > 0){
-            tmpViews.put(activity,views);
-        }else{
-            views = tmpViews.get(activity);
-        }
         for (View view : views) {
-            if (!canvasViews.contains(view)) {
-                canvasViews.add(new CanvasView(activity.getApplicationContext(), view));
+            if (null != view && !canvasViews.contains(view)) {
+                canvasViews.add(getCanvasView(view));
             }
         }
-        floatFormerView();
+    }
+
+    public CanvasView getCanvasView(View view){
+        viewGroup.setVisibility(View.VISIBLE);
+        CanvasView canvasView = new CanvasView(activity.getApplicationContext(), view);
+        addCanvasViewToWindow(canvasView);
+        return canvasView;
     }
 
     public void animateFormerViewToLatterView(View... views) {
-        final View[] examineViews;
-        if(views.length > 0){
-            examineViews = views;
-            tmpViews.put(activity,views);
-        }else{
-            examineViews = tmpViews.get(activity);
+//        setActivtiyTransition();
+        final View[] examineViews = views;
+        if(null == views){
+            return;
         }
-
         if(examineViews[0].getHeight() != 0) {
             examineView(examineViews);
         } else {
@@ -120,20 +122,32 @@ public final class ActivityTransitionManager {
         this.duration = duration;
     }
 
+    public boolean isAnimationRunning() {
+        if (animationEndCount <= 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public void setOnTransitioAnimationListener(OnTransitioAnimationListener onTransitioAnimationListener) {
         mOnTransitioAnimationListener = onTransitioAnimationListener;
     }
 
+//    public void setTransparentBackground(boolean transparentBackground) {
+//        this.transparentBackground = transparentBackground;
+//    }
+
     public void stopAllAnimation(){
         Iterator<CanvasView> iterator = canvasViews.iterator();
         while (iterator.hasNext()) {
+            CanvasView canvasView = iterator.next();
             try {
-                CanvasView canvasView = iterator.next();
                 if(isAnimationRunning()){
                     canvasView.animate().cancel();
                 }
                 viewGroup.removeView(canvasView);
-            } catch (Exception e) {
+            } catch (IllegalArgumentException e) {
             }
         }
     }
@@ -142,44 +156,51 @@ public final class ActivityTransitionManager {
         Iterator<CanvasView> iterator = canvasViews.iterator();
         while (iterator.hasNext()) {
             CanvasView canvasView = iterator.next();
-            View view = canvasView.getView();
-            int[] xy = getViewLocationOnScreen(view);
-            canvasView.setX(xy[0]);
-            canvasView.setY(xy[1]);
-            try {
-                viewGroup.addView(canvasView);
-            } catch (IllegalStateException e) {
-            }
+            addCanvasViewToWindow(canvasView);
         }
+    }
+
+    private void addCanvasViewToWindow(CanvasView canvasView){
+        View view = canvasView.getView();
+        int[] xy = getViewLocationOnScreen(view);
+        canvasView.setX(xy[0]);
+        canvasView.setY(xy[1]);
+        try {
+            viewGroup.addView(canvasView);
+        } catch (IllegalStateException e) {
+        }
+    }
+
+    public void animateViewToEnd(CanvasView canvasView){
+        animateView(canvasView, null);
     }
 
     public int[] getViewLocationOnScreen(View view) {
         int[] location = {0,0};
         view.getLocationOnScreen(location);
-        Rect rectangle= new Rect();
-        activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(rectangle);
-        location[1] -= rectangle.top;
         return location;
     }
 
-    private void setActivtiyTransition(){
-        ColorDrawable colorDrawable = new ColorDrawable();
-        int color;
-        if(transparentBackground){
-            color = Color.parseColor("#00000000");
-        }else{
-            color = Color.parseColor("#ffffffff");
+    public void removeCanvasViewFromWindow(CanvasView canvasView){
+        try {
+            viewGroup.removeView(canvasView);
+        } catch (IllegalStateException e) {
         }
-        colorDrawable.setColor(color);
-        activity.getWindow().setBackgroundDrawable(colorDrawable);
     }
 
-    private void clearFormerView() {
+    public void clearFormerView() {
         stopAllAnimation();
-        canvasViews.clear();
+        if(null != viewGroup){
+            viewGroup.removeAllViews();
+            viewGroup.setVisibility(View.GONE);
+        }
+        if(null != canvasViews){
+            canvasViews.clear();
+        }
     }
 
     private void examineView(View... views) {
+        animationEndCount = 0;
         if (null != mOnTransitioAnimationListener) {
             mOnTransitioAnimationListener.onAnimationStart();
         }
@@ -198,35 +219,71 @@ public final class ActivityTransitionManager {
     }
 
     private void animateView(final CanvasView canvasView, final View to) {
-        float scaleX = to.getWidth() / (float) canvasView.getWidth();
-        float scaleY = to.getHeight() / (float) canvasView.getHeight();
-        float scale = scaleX;
-        if(scaleX > scaleY){
-            scale = scaleY;
-        }
+        float x,y,scaleX,scaleY,rotation,rotationX,rotationY,alpha;
         int duration = this.duration;
-        if (duration < 0) {
-            duration = (int) to.animate().getDuration();
+        if(null != to){
+            int toWidth = to.getWidth();
+            int toHeight = to.getHeight();
+            float canvasViewWidth = canvasView.getWidth();
+            float canvasViewHeight = canvasView.getHeight();
+            scaleX = toWidth / canvasViewWidth;
+            scaleY = toHeight / canvasViewHeight;
+            if (duration < 0) {
+                duration = (int) to.animate().getDuration();
+            }
+            int[] xy;
+            if(null != to.getParent()){
+                xy = getViewLocationOnScreen(to);
+            }else{
+                xy = new int[]{(int) to.getX(), (int) to.getY()};
+            }
+            to.animate().setDuration(duration);
+            x = xy[0] + canvasView.getWidth() * ((scaleX - 1) / 2);
+            y = xy[1] + canvasView.getHeight() * ((scaleY - 1) / 2);
+            rotation = to.getRotation();
+            rotationX = to.getRotationX();
+            rotationY = to.getRotationY();
+            alpha = to.getAlpha();
+        }else{
+            if (duration < 0) {
+                duration = (int) canvasView.animate().getDuration();
+            }
+            int[] xy = canvasView.getTmpLocation();
+            x = xy[0];
+            y = xy[1];
+            x -= canvasView.getView().getWidth() / 2;
+            y -= canvasView.getView().getHeight() / 2;
+            scaleX = 0;
+            scaleY = 0;
+            rotation = 0;
+            rotationX = 0;
+            rotationY = 0;
+            alpha = 0;
         }
-        int[] xy = getViewLocationOnScreen(to);
-        to.animate().setDuration(duration);
         canvasView.animate()
-                .x(xy[0] + canvasView.getWidth() * ((scaleX - 1) / 2))
-                .y(xy[1] + canvasView.getHeight() * ((scaleY - 1) / 2))
-                .rotation(to.getRotation())
-                .rotationX(to.getRotationX())
-                .rotationY(to.getRotationY())
-                .alpha(to.getAlpha())
-                .scaleX(scale).scaleY(scale)
+                .x(x)
+                .y(y)
+                .rotation(rotation)
+                .rotationX(rotationX)
+                .rotationY(rotationY)
+                .alpha(alpha)
+                .scaleX(scaleX).scaleY(scaleY)
                 .setDuration(duration)
                 .setInterpolator(new DecelerateInterpolator())
                 .setListener(new Animator.AnimatorListener() {
+                    private float alpha = 1f;
+
                     @Override
                     public void onAnimationStart(Animator animation) {
                         setViewVisibility(View.INVISIBLE);
+                        if (!isAnimationRunning()) {
+                            if (null != mOnTransitioAnimationListener) {
+                                mOnTransitioAnimationListener.onAnimationStart();
+                            }
+                        }
                         animationEndCount++;
                         if (null != mOnTransitioAnimationListener) {
-                            mOnTransitioAnimationListener.onViewAnimationStart(canvasView,to, animation);
+                            mOnTransitioAnimationListener.onViewAnimationStart(canvasView, animation);
                         }
                     }
 
@@ -235,10 +292,17 @@ public final class ActivityTransitionManager {
                         setViewVisibility(View.VISIBLE);
                         animationEndCount--;
                         if (null != mOnTransitioAnimationListener) {
-                            mOnTransitioAnimationListener.onViewAnimationEnd(canvasView,to, animation);
+                            mOnTransitioAnimationListener.onViewAnimationEnd(canvasView, animation);
                         }
                         if (!isAnimationRunning()) {
-                            clearFormerView();
+                            if (null != viewGroup) {
+                                viewGroup.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        clearFormerView();
+                                    }
+                                }, 50);
+                            }
                             if (null != mOnTransitioAnimationListener) {
                                 mOnTransitioAnimationListener.onAnimationEnd(animation);
                             }
@@ -248,7 +312,6 @@ public final class ActivityTransitionManager {
                     @Override
                     public void onAnimationCancel(Animator animation) {
                         setViewVisibility(View.VISIBLE);
-                        animationEndCount--;
                         if (null != mOnTransitioAnimationListener) {
                             mOnTransitioAnimationListener.onViewAnimationCancel(canvasView, animation);
                         }
@@ -262,25 +325,18 @@ public final class ActivityTransitionManager {
                     }
 
                     private void setViewVisibility(int visibility) {
-                        canvasView.getView().setVisibility(visibility);
-                        to.setVisibility(visibility);
+                        if (null != canvasView.getView()) {
+                            canvasView.getView().setVisibility(visibility);
+                        }
+                        if (null != to) {
+                            if (View.VISIBLE == visibility) {
+                                to.setAlpha(alpha);
+                            } else {
+                                alpha = to.getAlpha();
+                                to.setAlpha(0f);
+                            }
+                        }
                     }
                 }).start();
-    }
-
-    public boolean isAnimationRunning() {
-        if (animationEndCount <= 0) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public void destroy(){
-        instance = null;
-        viewGroup = null;
-        canvasViews = null;
-        mOnTransitioAnimationListener = null;
-        tmpViews = null;
     }
 }

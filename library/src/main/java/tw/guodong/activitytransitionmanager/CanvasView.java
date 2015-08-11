@@ -1,7 +1,9 @@
 package tw.guodong.activitytransitionmanager;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -10,6 +12,7 @@ import android.view.ViewGroup;
  */
 public class CanvasView extends View{
     private View mView;
+    private int[] tmpLocation;
 
     public CanvasView(Context context,View view) {
         super(context);
@@ -32,10 +35,38 @@ public class CanvasView extends View{
 
     @Override
     protected void onDraw(Canvas canvas) {
-        mView.draw(canvas);
+        Bitmap vBitmap = null;
+        try {
+            vBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas vBitmapCanvas = new Canvas(vBitmap);
+            mView.draw(vBitmapCanvas);
+            Rect src = new Rect();
+            Rect dst = new Rect();
+            src.left = 0;
+            src.top = 0;
+            src.right = vBitmap.getWidth();
+            src.bottom = vBitmap.getHeight();
+            dst.left = 0;
+            dst.top = 0;
+            dst.right = vBitmap.getWidth();
+            dst.bottom = vBitmap.getHeight();
+            canvas.drawBitmap(vBitmap, src, dst, null);
+        }catch(Exception e){
+        }
+        if(null != vBitmap){
+            vBitmap.recycle();
+        }
     }
 
     public View getView() {
         return mView;
+    }
+
+    public int[] getTmpLocation() {
+        return tmpLocation;
+    }
+
+    public void setTmpLocation(int[] tmpLocation) {
+        this.tmpLocation = tmpLocation;
     }
 }
